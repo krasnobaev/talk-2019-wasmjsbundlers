@@ -1,0 +1,24 @@
+.plugstable td,
+.plugstable th
+{
+  /* font-size: 1.5rem; */
+  font-size: 60%;
+}
+
+.bigcode code
+{
+  /* font-size: 1.5rem; */
+  font-size: 60%;
+  line-height: 1rem;
+}
+
+.hidden
+{
+  display: none;
+}
+
+.grayed
+{
+  opacity: 0.3;
+  font-style: italic !important;
+}
