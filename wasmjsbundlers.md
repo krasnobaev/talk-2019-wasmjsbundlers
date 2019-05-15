@@ -343,6 +343,7 @@ Note:
 
 <span>usable <!-- .element: class="green-text" --> </span>
 <span>unusable <!-- .element: class="red-text" --> </span>
+untested
 
 Note:
   usable – билд отрабатывает как и подразумевается
