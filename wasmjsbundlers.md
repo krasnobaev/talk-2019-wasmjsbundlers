@@ -5,20 +5,26 @@ revealOptions:
   transition: 'fade'
 ---
 # Обзор бандлеров в JS
-## Как приготовить .wasm
+## Как приготовить `.wasm`
 
-<!-- ![cat](sub/cat.jpg) -->
+<small>Алексей Краснобаев, BDO Unicon</small>
 
 Note:
-  Рассмотрим способы подключения WebAssembly модулей в веб-приложения.
+  Рассказать предысторию, как я выбирал билдер полгода назад.
+
+  На выхлопе получилось пара демок.
 
 ---
 
 ### План на сегодня
 
-*
-* рассмотрим варианты импорта .wasm файлов
-* увидим примеры сборки
+* импортируем готовые `.wasm` файлы в JS
+* собираем `.wasm` на лету
+* сравним сборщики (на примере Rust)
+* посмотрим примеры работы сборщиков
+
+Note:
+  Зачем с нуля настраивать свой pipeline если есть готовый.
 
 ---
 
@@ -50,7 +56,9 @@ Note:
 
   .wat может быть транслиован в бинарный формат, удобный для передачи по сети.
 
-  .wat и .wasm транслируются взаимно-однозначно
+  .wat и .wasm транслируются взаимно-однозначно, можно использовать официальный WebAssembly/binaryen
+
+  Предпросмотр доступен в хроме или в VS Сode
 
 ----
 
@@ -72,10 +80,8 @@ Note:
   (func $add (param i32) (param i32) (result i32)
     (get_local 0)
     (get_local 1)
-    (i32.add)
-  )
-  (export "add" (func $add))
-)
+    (i32.add))
+  (export "add" (func $add)))
 ```
 
 Note:
@@ -83,59 +89,88 @@ Note:
 
   но этот формат не стандартизирован, хотя и описан в официальном стандарте
 
+  https://webassembly.studio
+
 ---
 
-### Варианты импорта 1️⃣
+### Способы импорта `.wasm` в JS 1️⃣
 
-* объявление внутри js – бинарный формат <mark>TODO:</mark>
-* объявление внутри js – `.wat`-исходники <mark>TODO:</mark>
-* ручная загрузка файла .wasm <mark>TODO:</mark>
+#### готовый `.wasm`
 
-----
-
-* объявление внутри js – бинарный формат <mark>TODO:</mark>
-```js
-let instance = WebAssembly.instantiate(Buffer.from([0,61,…]));
-alert(`a=1, b=2, a+b=${instance.exports.add(1, 2)}`);
-```
-
-----
-
-* объявление внутри js – `.wat`-исходники <mark>TODO:</mark>
-```js
-const src = '(module (type $t0 (func (param i32 i32) (result i32)))…';
-let module = webassemblyjs.instantiateFromSource(src);
-alert(`a=1, b=2, a+b=${module.exports.add(1, 2)}`);
-```
-
-----
-
-* ручная загрузка файла .wasm <mark>TODO:</mark>
-
-```js
-request = new XMLHttpRequest();
-request.open('GET', '/add.wasm');
-request.responseType = 'arraybuffer';
-request.send();
-
-request.onload = function() {
-  webassemblyjs
-    .instantiate(request.response)
-    .then((module) => {
-      alert(`a=1, b=2, a+b=${module.instance.exports.add(1, 2)}`);
-    });
-};
-```
-<!-- .element: class="big code" -->
+* ручная загрузка файла `.wasm` по HTTP
+* сериализованный `.wasm` в JS
+* компиляция `.wat` на лету (e.g. с помощью <pre class="javascript"><code data-trim data-noescape>webassemblyjs.instantiateFromSource(code)</code></pre>)
 
 Note:
-  импорт файла .wasm
+  импорт wasm в js потому что другого способа использования в браузерном окружении не существует.
 
-  пример на основе https://webassembly.js.org/docs/example-add-wasm.html
+  сериализация в BASE64, либо побайтово, как любят делать некоторые плагины.
+
+  в index.html нельзя заинклюдить.
+
+  https://github.com/xtuc/webassemblyjs/tree/master/packages/webassemblyjs
+
+----
+
+#### ручная загрузка файла `.wasm` по `HTTP`
+
+```js
+fetch('https://krasnobaev.github.io/rust-webasm/add.wasm')
+.then(response =>
+  response.arrayBuffer()
+).then(bytes =>
+  WebAssembly.instantiate(bytes)
+).then(results => {
+  alert(`a=1, b=2, a+b=${results.instance.exports.add(1,2)}`);
+});
+```
+
+```js
+WebAssembly.instantiateStreaming(
+  fetch('https://krasnobaev.github.io/rust-webasm/add.wasm')
+).then(results => {
+  alert(`a=1, b=2, a+b=${results.instance.exports.add(1,2)}`);
+});
+```
+
+Note:
+  пожалуй самый логичный способ, но wasm-файл уже должен быть собран
+
+  примеры на основе
+  https://developer.mozilla.org/en-US/docs/WebAssembly/Loading_and_running
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/instantiate
 
   в заголовках html грузить нельзя, импорт только через javascript
 
-  проблема в том, что
+----
+
+#### сериализованный `.wasm` в JS
+
+```js
+let Buffer = new Uint8Array([
+    '00', '61', '73', '6d', '01', '00', '00', '00', '01', '07', '01', '60', '02', '7f', '7f', '01',
+    '7f', '03', '02', '01', '00', '07', '07', '01', '03', '61', '64', '64', '00', '00', '0a', '09',
+    '01', '07', '00', '20', '00', '20', '01', '6a', '0b',
+].map(num => parseInt(num, 16)));
+let wasmModule = new WebAssembly.Module(Buffer);
+let wasmInstance = new WebAssembly.Instance(wasmModule, []);
+alert(`a=1, b=2, a+b=${wasmInstance.exports.add(1, 2)}`);
+```
+
+----
+
+#### компиляция `.wat` на лету
+
+<pre class="javascript"><code data-trim data-noescape>
+const src = `(module
+  (func $add (param i32) (param i32) (result i32)
+    (get_local 0)
+    (get_local 1)
+    (i32.add))
+  (export "add" (func $add)))`;
+let module = <mark>webassemblyjs</mark>.instantiateFromSource(src);
+alert(`a=1, b=2, a+b=${module.exports.add(1, 2)}`);
+</code></pre>
 
 ---
 
@@ -148,7 +183,7 @@ Note:
 * <!-- .element: class="fragment" data-fragment-index="1" --> 🐣 JavaScript via `Duktape`
 
 Специализированные языки <!-- .element: class="fragment" data-fragment-index="2" -->
-* <!-- .element: class="fragment" data-fragment-index="2" --> 🐥 AssemblyScript (TS-based)
+* <!-- .element: class="fragment" data-fragment-index="2" --> 🐥 AssemblyScript (TS-based, Binaryen)
 * <!-- .element: class="fragment" data-fragment-index="2" --> 🐣 Walt (alternative JS-based syntax for `.wat`)
 * <!-- .element: class="fragment" data-fragment-index="2" --> 🐣 Wam (`.wast` superset)
 
@@ -159,7 +194,7 @@ Note:
 
   @publicquestion А кто stand-alone/mobile?
 
-  Варианты сборщиков для Rust: cargo, wasm-bindgen, wasm-pack
+  binaryen – https://github.com/WebAssembly/binaryen
 
   Go - нативная поддержка
 
@@ -167,7 +202,18 @@ Note:
 
   TODO: `.walt` транспилируется в `.wat`?
 
-  TODO: Можно ли называть AssemblyScript/Walt/Wam прямыми альтернативами?
+  Можно ли называть AssemblyScript/Walt/Wam прямыми альтернативами?
+
+----
+
+#### 🐥 Rust
+
+* `cargo build`
+* `wasm-bindgen`
+* <!-- .element: class="green-text" --> `wasm-pack`
+
+Note:
+  https://rustwasm.github.io/wasm-bindgen/examples/hello-world.html
 
 ---
 
@@ -192,48 +238,58 @@ import('<mark>./Cargo.toml</mark><!-- .element: class="fragment" data-fragment-i
 Note:
   1. Преположим, что мы реализовали логику на Rust
 
+  `#[no_mangle]` vs `#[wasm_bindgen]`
+
 ---
 
-### Варианты импорта 2️⃣
+### Способы импорта wasm в JS 2️⃣
 
-* <!-- .element: class="grayed" --> объявление внутри js – бинарный формат
-* <!-- .element: class="grayed" --> объявление внутри js – `.wat`-исходники
-* <!-- .element: class="grayed" --> ручная загрузка файла .wasm
-* модуль
+#### Автоматизируем сборку `.wasm`
+
+* импорт конкретных модулей
 ```js
 import module from './lib.rs';
 ```
 
-* бандл
+* импорт всего бандла
 ```js
 import module from './Cargo.toml';
 ```
 * динамический `import()`
 ```js
-let module = await import('./Cargo.toml')
+let module = await import('./Cargo.toml'); ////
 ```
 
 Note:
+  удобство модулей - небольшие конкретные функции, обработка сайд-эффектов
+
+  удобство бандлов - мб движок, большой код
+
+  динамический `import()` как модулей так и бандлов
 
 ---
 
-Возможности бандлера
+Возможности потенциального сборщика `.wasm`
+* <!-- .element: class="fragment" data-fragment-index="1" --> доступность JS-окружения в .wasm (e.g. <code class="nowrap" data-trim data-noescape>#[wasm_bindgen]</code>)
 * <!-- .element: class="fragment" data-fragment-index="1" --> сериализация .wasm внутрь .js
-* <!-- .element: class="fragment" data-fragment-index="1" --> асинхронный импорт
-* <!-- .element: class="fragment" data-fragment-index="1" --> <mark>TODO:</mark> wasm_bindgen extern?
+* <!-- .element: class="fragment" data-fragment-index="1" --> асинхронная загрузка .wasm
 * <!-- .element: class="fragment" data-fragment-index="2" --> прямой импорт (.rs/.toml)
-* <!-- .element: class="fragment" data-fragment-index="2" --> livereload при изменении исходников (.c/.rs/…)
+* <!-- .element: class="fragment" data-fragment-index="2" --> livereload при изменении исходников (.rs/.c/…)
 
 также интересно: <!-- .element: class="fragment" data-fragment-index="3" -->
-* размер бандла <!-- .element: class="fragment" data-fragment-index="3" -->
-* скорость сборки <!-- .element: class="fragment" data-fragment-index="3" -->
+* размер бандла / скорость сборки <!-- .element: class="fragment" data-fragment-index="3" -->
+* отсутствие лишних абстракций <!-- .element: class="fragment" data-fragment-index="3" -->
 
 Note:
+  доступность JS-окружения в .wasm - по умолчанию можно только читать числа из .wasm, чтобы общаться более сложными объектами или управлять из .wasm например canvas'ом, нужно использовать дополнительные обёртки типа wasm_bindgen (на примере rust).
+
   основные фичи: сериализация
 
   второстепенные (DX): прямой импорт, livereload
 
   НФТ: размер бандла / скорость сборки
+
+  так например rollup-plugin-rust вынуждает делать ручной импорт buffer-es6 в исходниках
 
 ---
 
@@ -245,13 +301,14 @@ design-time <!-- .element: class="fragment" data-fragment-index="1" -->
 * <!-- .element: class="fragment" data-fragment-index="2" --> `./{Cargo.toml, lib.rs}`
 
 build-time (Rust) <!-- .element: class="fragment" data-fragment-index="3" -->
-<!-- * `./bin/` – бинарники wasm-bindgen -->
 * <!-- .element: class="fragment" data-fragment-index="4" --> `./target/` – результат работы сборщика
 * <!-- .element: class="fragment gray" data-fragment-index="5" --> `./pkg/` – предварительный wasm, вместе с ts-определениями (только для wasm-pack?)
-* <!-- .element: class="fragment" data-fragment-index="6" --> `./dist/` – готовый релиз (wasm+js)
+* <!-- .element: class="fragment" data-fragment-index="6" --> `./dist/` – готовый релиз (.wasm+.js)
 
 Note:
-  предположим, что всё располагаем
+  всё располагаем в src
+
+  ещё бывает wasm-bindgen мусорит в `./bin/`
 
 ---
 
@@ -294,39 +351,43 @@ Note:
 
   parcel-plugin-wasm.rs - есть пример использования у команды rustwasm https://github.com/rustwasm/rust-parcel-template
 
-  parcel-plugin-cargo-web     |37 GH stars |Latest commit 5498476  on Jan 28        |                          |
-  parcel-plugin-rustwasm      |2  GH stars |Latest commit 09ff5fe  on Sep 25, 2018  |last commit 8 months ago  |
-  parcel-plugin-wasm.rs       |18 GH stars |Latest commit dbc50f1  on Apr 22        |                          |
-  rollup-plugin-rust          |17 GH stars |Latest commit ef411b8  on Feb 2         |допилить напильником      |
-  @wasm-tool/wasm-pack-plugin |34 GH stars |Latest commit 8db33a1  on Mar 14        |                          |
-  |rollup-plugin-wasm         |64          |                                        |необходим готовый .wasm   |
+  Rust official docs: https://rustwasm.github.io/docs/wasm-bindgen/examples/without-a-bundler.html
+
+  Rust official docs2: https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html
+
+  parcel-plugin-cargo-web     |37 ⭐ |Latest commit 5498476  on Jan 28        |                          |
+  parcel-plugin-rustwasm      |2 ⭐  |Latest commit 09ff5fe  on Sep 25, 2018  |last commit 8 months ago  |
+  parcel-plugin-wasm.rs       |18 ⭐ |Latest commit dbc50f1  on Apr 22        |                          |
+  rollup-plugin-rust          |17 ⭐ |Latest commit ef411b8  on Feb 2         |допилить напильником      |
+  rollup-plugin-wasm          |64 ⭐ |                                        |необходим готовый .wasm   |
+  @wasm-tool/wasm-pack-plugin |34 ⭐ |Latest commit 8db33a1  on Mar 14        |                          |
 
 ---
 
 <!-- .slide: class="plugstable" -->
 ### Возможности плагинов (Rust)
 
-|plugin                                                          |livereload|.wasm async load|import .rs|import .toml|wasm_bindgen extern(<mark>TODO:</mark>)|serialize .wasm in .js|
-|----------------------------------------------------------------|----------|----------|----------|------------|------------|-----------|
-|parcel-plugin-cargo-web  <!-- .element: class="green-text" -->  |.js       |YES       |sync/async|            |            |           |
-|parcel-plugin-rustwasm   <!-- .element: class="red-text" -->    |.js       |YES       |sync/async|            |YES         |           |
-|parcel-plugin-wasm.rs    <!-- .element: class="green-text" -->  |.js       |          |sync      |sync        |YES         |           |
-|rollup-plugin-rust       <!-- .element: class="red-text" -->    |<i>NO</i> |YES       |async     |            |            |YES        |
-|<span class="green-text">wasm-pack via webpack</span>           |<span>.js/.rs</span><!-- .element: class="fragment highlight-green" data-fragment-index="2" -->|YES| | |NO? |  |
-<!-- |rollup-plugin-wasm                                              |          |?         |          |            |            |YES        | -->
+|plugin                                        |#[wasm_bindgen] in .rs|livereload|.wasm async load|import .rs|import .toml|serialize .wasm in .js|
+|----------------------------------------------------------------|----|----------|----------------|----------|------------|----------------------|
+|parcel-plugin-cargo-web  <!-- .element: class="green-text" -->  |NO  |.js       |YES             |sync/async|            |                      |
+|parcel-plugin-rustwasm   <!-- .element: class="red-text" -->    |YES |.js       |YES             |sync/async|            |                      |
+|parcel-plugin-wasm.rs    <!-- .element: class="green-text" -->  |YES |.js       |                |sync      |sync        |                      |
+|rollup-plugin-rust       <!-- .element: class="red-text" -->    |NO  |<i>NO</i> |YES             |async     |            |YES                   |
+|<span class="green-text">wasm-pack via webpack</span>           |YES |<span>.js/.rs</span><!-- .element: class="fragment highlight-green" data-fragment-index="2" -->|YES| | | |
+<!-- |rollup-plugin-wasm                                              |    |?         |                |          |            |YES                   | -->
 
 Note:
   serialize .wasm file in .js - специально в конце - т.к. сомнительная функция
 
-  parcel-plugin-cargo-web -
+  parcel-plugin-cargo-web - нет поддержки директивы #[wasm_bindgen]
 
-  parcel-plugin-rustwasm  -
+  parcel-plugin-rustwasm  - не собирается, раньше всё работало, нужно перепроверять
 
-  parcel-plugin-wasm.rs   -
+  parcel-plugin-wasm.rs   - всё бы ничего но нет livereload по .rs
 
-  rollup-plugin-rust      -
+  rollup-plugin-rust      - не работает так как заявлено в документации к плагину
 
-  wasm-pack via webpack   - webpack require loading of compiled wasm binary
+  wasm-pack via webpack   - некрасивый импорт `./pkg` и большой билд, в остальном всё в порядке
 
 ---
 
@@ -341,7 +402,7 @@ Note:
 |rollup-plugin-rust       <!-- .element: class="red-text"   -->  |     10&nbsp;MiB|     35&nbsp;KiB|≈12s          |
 |wasm-pack via webpack    <!-- .element: class="green-text" -->  |  392.4&nbsp;MiB|    975&nbsp;KiB|≈40s          |
 
-\* <small>примерное время без усреднений (без сборки wasm-bindgen)</small>
+\* <small>примерное время без усреднений и сборки с `#[wasm_bindgen]`</small>
 
 Note:
   данные на тот момент когда это всё собиралось (12/2018)
@@ -436,9 +497,33 @@ import('./pkg')
 
 Note:
 
+----
+
+### Troubleshooting
+
+```bash
+npm run clean # убрать все build-time артефакты
+rm -r ~/.cargo/registry/cache
+rustup default nightly
+rustup update
+# обновить зависимости package.json/Cargo.toml
+```
+
+Note:
+  ~/.cargo/registry/cache – только кэш собранных пакетов, исходники в другом месте
+
+  обновить зависимости package.json/Cargo.toml – удобнее использовать плагины с подсветкой текущей последней версии, доступны как для Cargo.toml так и для package.json (VSCode OFK)
+
+---
+
+### Время выводов
+
+* Я остановился на @wasm-tool/wasm-pack-plugin
+* Если строить свой pipeline – лучше брать за основу `wasm-pack` или `wasm-bindgen`
+* Если делаете свои плагины, делайте папочку `example`
+
+Note:
+
 ---
 
 Время вопросов
-
-Note:
-  помещайте пример в папочку `example`

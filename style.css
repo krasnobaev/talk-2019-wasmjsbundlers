@@ -44,3 +44,18 @@
 {
   list-style-image: url('asset/1.png');
 } */
+
+.octicon {
+  display: inline-block;
+  vertical-align: text-top;
+  fill: currentColor;
+  vertical-align: baseline !important;
+}
+
+.light.octicon {
+  fill: #fff;
+}
+
+.nowrap {
+  white-space: nowrap;
+}

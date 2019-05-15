@@ -58,7 +58,10 @@
         { src: '{{{base}}}/plugin/zoom-js/zoom.js', async: true },
         { src: '{{{base}}}/plugin/notes/notes.js', async: true },
         { src: '{{{base}}}/plugin/math/math.js', async: true },
-        { src: '{{{base}}}/plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(); } },
+        { src: '{{{base}}}/plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(
+          'WebAssembly Moscow Meetup #1 - Обзор бандлеров JS',
+          null
+        ); } },
         { src: 'plugin/pdfexport/pdfexport.js', async: true }
       ];
 
