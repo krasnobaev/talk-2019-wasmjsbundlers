@@ -35,6 +35,11 @@
   border-bottom-color: inherit !important;
 }
 
+li.nobullets
+{
+  list-style-type: none;
+}
+
 /* .li-gulp
 {
   list-style-image: url('asset/1.png');
@@ -45,17 +50,20 @@
   list-style-image: url('asset/1.png');
 } */
 
-.octicon {
+.octicon
+{
   display: inline-block;
   vertical-align: text-top;
   fill: currentColor;
   vertical-align: baseline !important;
 }
 
-.light.octicon {
+.light.octicon
+{
   fill: #fff;
 }
 
-.nowrap {
+.nowrap
+{
   white-space: nowrap;
 }

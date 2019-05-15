@@ -12,7 +12,7 @@ revealOptions:
 Note:
   Рассказать предысторию, как я выбирал билдер полгода назад.
 
-  На выхлопе получилось пара демок.
+  На выхлопе получилась пара демок.
 
 ---
 
@@ -177,15 +177,15 @@ alert(`a=1, b=2, a+b=${module.exports.add(1, 2)}`);
 ### На чём готовить `.wasm`
 
 Привычные языки <!-- .element: class="fragment" data-fragment-index="1" -->
-* <!-- .element: class="fragment" data-fragment-index="1" --> 🐥 C, LLVM via `emscripten`
-* <!-- .element: class="fragment" data-fragment-index="1" --> <div><!-- .element: class="fragment highlight-current-blue" data-fragment-index="3" --> 🐥 Rust via `wasm-pack`</div>
-* <!-- .element: class="fragment" data-fragment-index="1" --> 🐥 Go via `GOARCH=wasm`
-* <!-- .element: class="fragment" data-fragment-index="1" --> 🐣 JavaScript via `Duktape`
+* <!-- .element: class="fragment nobullets" data-fragment-index="1" --> 🐥 C, LLVM via `emscripten`
+* <!-- .element: class="fragment nobullets" data-fragment-index="1" --> <div><!-- .element: class="fragment highlight-current-blue" data-fragment-index="3" --> 🐥 Rust via `wasm-pack`</div>
+* <!-- .element: class="fragment nobullets" data-fragment-index="1" --> 🐥 Go via `GOARCH=wasm`
+* <!-- .element: class="fragment nobullets" data-fragment-index="1" --> 🐣 JavaScript via `Duktape`
 
 Специализированные языки <!-- .element: class="fragment" data-fragment-index="2" -->
-* <!-- .element: class="fragment" data-fragment-index="2" --> 🐥 AssemblyScript (TS-based, Binaryen)
-* <!-- .element: class="fragment" data-fragment-index="2" --> 🐣 Walt (alternative JS-based syntax for `.wat`)
-* <!-- .element: class="fragment" data-fragment-index="2" --> 🐣 Wam (`.wast` superset)
+* <!-- .element: class="fragment nobullets" data-fragment-index="2" --> 🐥 AssemblyScript (TS-based, Binaryen)
+* <!-- .element: class="fragment nobullets" data-fragment-index="2" --> 🐣 Walt (alternative JS-based syntax for `.wat`)
+* <!-- .element: class="fragment nobullets" data-fragment-index="2" --> 🐣 Wam (`.wast` superset)
 
 Note:
   https://github.com/appcypher/awesome-wasm-langs
