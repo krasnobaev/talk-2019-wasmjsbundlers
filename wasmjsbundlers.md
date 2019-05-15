@@ -208,9 +208,11 @@ Note:
 
 ----
 
+### На чём готовить `.wasm`
+
 #### 🐥 Rust
 
-* `cargo build`
+* `cargo build --target=wasm32-unknown-unknown`
 * `wasm-bindgen`
 * <!-- .element: class="green-text" --> `wasm-pack`
 
@@ -357,6 +359,8 @@ Note:
   Rust official docs: https://rustwasm.github.io/docs/wasm-bindgen/examples/without-a-bundler.html
 
   Rust official docs2: https://rustwasm.github.io/docs/wasm-bindgen/reference/deployment.html
+
+  `cargo build` means `cargo build --target=wasm32-unknown-unknown`
 
   parcel-plugin-cargo-web     |37 ⭐ |Latest commit 5498476  on Jan 28        |                          |
   parcel-plugin-rustwasm      |2 ⭐  |Latest commit 09ff5fe  on Sep 25, 2018  |last commit 8 months ago  |
