@@ -22,3 +22,25 @@
   opacity: 0.3;
   font-style: italic !important;
 }
+
+.red-text
+{
+  color: red !important;
+  border-bottom-color: inherit !important;
+}
+
+.green-text
+{
+  color: #17ff2e !important;
+  border-bottom-color: inherit !important;
+}
+
+/* .li-gulp
+{
+  list-style-image: url('asset/1.png');
+} */
+
+/* .li-grunt
+{
+  list-style-image: url('asset/1.png');
+} */
