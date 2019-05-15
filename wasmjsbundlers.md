@@ -179,7 +179,7 @@ alert(`a=1, b=2, a+b=${module.exports.add(1, 2)}`);
 ### На чём готовить `.wasm`
 
 Привычные языки <!-- .element: class="fragment" data-fragment-index="1" -->
-* <!-- .element: class="fragment nobullets" data-fragment-index="1" --> 🐥 C, LLVM via `emscripten`
+* <!-- .element: class="fragment nobullets" data-fragment-index="1" --> 🐥 C/C++ via `emscripten`/LLVM
 * <!-- .element: class="fragment nobullets" data-fragment-index="1" --> <div><!-- .element: class="fragment highlight-current-blue" data-fragment-index="3" --> 🐥 Rust via `wasm-pack`</div>
 * <!-- .element: class="fragment nobullets" data-fragment-index="1" --> 🐥 Go via `GOARCH=wasm`
 * <!-- .element: class="fragment nobullets" data-fragment-index="1" --> 🐣 JavaScript via `Duktape`
