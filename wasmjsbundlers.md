@@ -49,10 +49,10 @@ FM-синтезатор (WIP)
 
 <small>https://github.com/krasnobaev/webasm-webgl-tutorial</small>
 
-* 8 простых примеров использования WebGL в JS
-* 4 уже переписано на rust/wasm
-* с пятого начались проблемы с draw_elements_with_i32/draw_arrays
+* 8 простых примеров использования WebGL в JS, 5 уже готово
 * исходные примеры на JS https://mdn.github.io/webgl-examples/
+
+<iframe data-src="https://krasnobaev.github.io/webasm-webgl-tutorial/dist/#rust-5" style="background-color:#fff;height:30rem;width:100%;"></iframe>
 
 ----
 
@@ -122,7 +122,7 @@ Note:
 
 * ручная загрузка файла .wasm по HTTP
 * сериализованный .wasm в JS
-* компиляция .wat на лету (e.g. с помощью <pre class="javascript"><code data-trim data-noescape>webassemblyjs.instantiateFromSource(code)</code></pre>)
+* компиляция .wat в runtime
 
 Note:
   импорт wasm в js потому что другого способа использования в браузерном окружении не существует.
@@ -182,7 +182,7 @@ alert(`a=1, b=2, a+b=${wasmInstance.exports.add(1, 2)}`);
 
 ----
 
-#### компиляция .wat на лету
+#### компиляция .wat в runtime
 
 <pre class="javascript"><code data-trim data-noescape>
 const src = `(module
