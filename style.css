@@ -7,9 +7,9 @@
 
 .bigcode code
 {
-  /* font-size: 1.5rem; */
-  font-size: 60%;
-  line-height: 1rem;
+  font-size: 1rem;
+  /* font-size: 60%; */
+  line-height: 1.5rem;
 }
 
 .hidden

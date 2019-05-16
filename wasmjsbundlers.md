@@ -18,19 +18,71 @@ Note:
 
 ### План на сегодня
 
+* как я начал заниматься WebAssembly (демки) <!-- .element: class="fragment highlight-current-green" data-fragment-index="1" -->
 * импортируем готовые .wasm файлы в JS
-* собираем .wasm на лету
+* собираем .wasm через бандлер
 * сравним сборщики (на примере Rust)
-* посмотрим примеры работы сборщиков
-
-<small>все примеры доступны по адресу https://github.com/krasnobaev/webasm-jsbundlers</small>
 
 Note:
-  Зачем с нуля настраивать свой pipeline если есть готовый.
+
+---
+
+### Демки
+
+* Простые примеры использования бандлеров https://github.com/krasnobaev/webasm-jsbundlers
+* FM-синтезатор (WIP) https://github.com/krasnobaev/webasm-fmosc
+* WebGL-tutorial на основе MDN-примеров (WIP) https://github.com/krasnobaev/webasm-webgl-tutorial
+
+Note:
+
+----
+
+FM-синтезатор (WIP)
+
+<small>https://github.com/krasnobaev/webasm-fmosc</small>
+
+<iframe data-src="https://krasnobaev.github.io/webasm-jsbundlers" style="background-color:#fff;height:60rem;width:100%;"></iframe>
+
+----
+
+#### WebGL-tutorial на основе MDN-примеров (WIP)
+
+<small>https://github.com/krasnobaev/webasm-webgl-tutorial</small>
+
+* 8 простых примеров использования WebGL в JS
+* 4 уже переписано на rust/wasm
+* с пятого начались проблемы с draw_elements_with_i32/draw_arrays
+* исходные примеры на JS https://mdn.github.io/webgl-examples/
+
+----
+
+#### Примеры использования бандлеров
+
+<small>https://github.com/krasnobaev/webasm-jsbundlers</small>
+
+* Просто Hello World для каждого плагина
+* Примеры будут в конце презентации
+
+---
+
+### План на сегодня
+
+* как я начал заниматься WebAssembly (демки)
+* импортируем готовые .wasm файлы в JS <!-- .element: class="green-text" -->
+* собираем .wasm через бандлер
+* сравним сборщики (на примере Rust)
 
 ---
 
 ### простой пример add.wasm
+
+.wasm – бинарный формат
+```bash
+0000000 00 61 73 6d 01 00 00 00 01 07 01 60 02 7f 7f 01
+0000010 7f 03 02 01 00 07 07 01 03 61 64 64 00 00 0a 09
+0000020 01 07 00 20 00 20 01 6a 0b
+0000029
+```
 
 .wat – [WebAssembly text format](https://webassembly.github.io/spec/core/text/index.html)
 ```bash
@@ -41,14 +93,6 @@ Note:
     get_local $p1
     i32.add)
   (export "add" (func $add)))
-```
-
-.wasm – бинарный формат
-```bash
-0000000 00 61 73 6d 01 00 00 00 01 07 01 60 02 7f 7f 01
-0000010 7f 03 02 01 00 07 07 01 03 61 64 64 00 00 0a 09
-0000020 01 07 00 20 00 20 01 6a 0b
-0000029
 ```
 
 Note:
@@ -153,6 +197,15 @@ alert(`a=1, b=2, a+b=${module.exports.add(1, 2)}`);
 
 ---
 
+### План на сегодня
+
+* как я начал заниматься WebAssembly (демки)
+* импортируем готовые .wasm файлы в JS
+* собираем .wasm через бандлер <!-- .element: class="green-text" -->
+* сравним сборщики (на примере Rust)
+
+---
+
 ### На чём готовить .wasm
 
 Привычные языки <!-- .element: class="fragment" data-fragment-index="1" -->
@@ -169,19 +222,11 @@ alert(`a=1, b=2, a+b=${module.exports.add(1, 2)}`);
 Note:
   https://github.com/appcypher/awesome-wasm-langs
 
-  @publicquestion Кто здесь frontend?
-
-  @publicquestion А кто stand-alone/mobile?
-
   binaryen – https://github.com/WebAssembly/binaryen
-
-  Go - нативная поддержка
 
   walt - https://ballercat.github.io/walt/
 
   TODO: `.walt` транспилируется в .wat?
-
-  Можно ли называть AssemblyScript/Walt/Wam прямыми альтернативами?
 
 ----
 
@@ -309,10 +354,22 @@ Note:
 
 ---
 
+### План на сегодня
+
+* как я начал заниматься WebAssembly (демки)
+* импортируем готовые .wasm файлы в JS
+* собираем .wasm через бандлер
+* сравним сборщики (на примере Rust) <!-- .element: class="green-text" -->
+
+Note:
+  Зачем с нуля настраивать свой pipeline если есть готовый.
+
+---
+
 <!-- .slide: class="plugstable" -->
 ### Доступные плагины для основных бандлеров (Rust)
 
-|plugin                                                          |GitHub|builder       |                          |
+|plugin                                                          |GitHub|builder (cli) |                          |
 |----------------------------------------------------------------|------|--------------|--------------------------|
 |parcel-plugin-cargo-web  <!-- .element: class="green-text" -->  |37 ⭐ |cargo build   |                          |
 |parcel-plugin-rustwasm   <!-- .element: class="red-text"   -->  |2 ⭐  |wasm-bindgen  |                          |
@@ -352,7 +409,7 @@ Note:
 
 |plugin                                        |#[wasm_bindgen] in .rs|livereload|.wasm async load|import .rs|import .toml|serialize .wasm in .js|
 |----------------------------------------------------------------|----|----------|----------------|----------|------------|----------------------|
-|parcel-plugin-cargo-web  <!-- .element: class="green-text" -->  |NO  |.js       |YES             |sync/async|            |                      |
+|parcel-plugin-cargo-web  <!-- .element: class="green-text" -->  |NO  |.js       |YES             |sync/async|CATCH FIRE  |                      |
 |parcel-plugin-rustwasm   <!-- .element: class="red-text" -->    |YES |.js       |YES             |sync/async|            |                      |
 |parcel-plugin-wasm.rs    <!-- .element: class="green-text" -->  |YES |.js       |                |sync      |sync        |                      |
 |rollup-plugin-rust       <!-- .element: class="red-text" -->    |NO  |<i>NO</i> |YES             |async     |            |YES                   |
@@ -360,6 +417,12 @@ Note:
 <!-- |rollup-plugin-wasm                                              |    |?         |                |          |            |YES                   | -->
 
 Note:
+  CATCH FIRE - не зависнет, но призадумается
+
+  livereload - какой-то из плагинов использует порт по умолчанию (35675?)
+
+  конечно стоит делать Issue
+
   serialize .wasm file in .js - специально в конце - т.к. сомнительная функция
 
   parcel-plugin-cargo-web - нет поддержки директивы #[wasm_bindgen]
@@ -406,6 +469,33 @@ Note:
   |parcel-plugin-wasm.rs  |   42&nbsp;KiB/17&nbsp;KiB  |
   |rollup-plugin-rust     |  220&nbsp;KiB/35&nbsp;KiB  |
   |wasm-pack via webpack  |  3.4&nbsp;MiB/975&nbsp;KiB |
+
+----
+
+### lib.rs
+
+```rust
+extern crate wasm_bindgen;
+
+use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+extern {
+  fn alert(s: &str);
+}
+
+#[wasm_bindgen]
+pub fn greet(name: &str) {
+  alert(&format!("Hello, {}!", name));
+}
+
+// #[no_mangle]
+#[wasm_bindgen]
+pub fn add(a: i32, b: i32) -> i32 {
+  return a + b
+}
+```
+<!-- .element: class="bigcode" -->
 
 ----
 
@@ -482,7 +572,7 @@ Note:
 
 ----
 
-### Troubleshooting
+#### Troubleshooting
 
 ```bash
 npm run clean # убрать все build-time артефакты
@@ -496,28 +586,6 @@ Note:
   ~/.cargo/registry/cache – только кэш собранных пакетов, исходники в другом месте
 
   обновить зависимости package.json/Cargo.toml – удобнее использовать плагины с подсветкой текущей последней версии, доступны как для Cargo.toml так и для package.json (VSCode OFK)
-
----
-
-### Демки
-
-* Примеры использования бандлеров (Hello World) https://github.com/krasnobaev/webasm-jsbundlers
-* FM-синтезатор (WIP) https://github.com/krasnobaev/webasm-fmosc
-* WebGL-tutorial на основе MDN-примеров (WIP) https://github.com/krasnobaev/webasm-webgl-tutorial
-
-Note:
-
-----
-
-FM-синтезатор (WIP)
-
-<iframe data-src="https://krasnobaev.github.io/webasm-jsbundlers" style="background-color:#fff;height:60rem;width:100%;"></iframe>
-
-----
-
-#### WebGL-tutorial на основе MDN-примеров (WIP)
-
-<iframe src="https://github.com/krasnobaev/webasm-jsbundlers"></iframe>
 
 ---
 
