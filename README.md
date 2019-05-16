@@ -3,7 +3,7 @@
 
 Материалы доклада Первого Московского Митапа по WebAssembly (WebAssembly Moscow Meetup #1).
 
-репозиторий с примерами - https://github.com/krasnobaev/rust-webasm
+репозиторий с примерами - https://github.com/krasnobaev/webasm-jsbundlers
 
 ## Run
 
