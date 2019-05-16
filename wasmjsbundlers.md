@@ -41,7 +41,7 @@ FM-синтезатор (WIP)
 
 <small>https://github.com/krasnobaev/webasm-fmosc</small>
 
-<iframe data-src="https://krasnobaev.github.io/webasm-jsbundlers" style="background-color:#fff;height:60rem;width:100%;"></iframe>
+<iframe data-src="https://krasnobaev.github.io/webasm-fmosc/index.html" style="background-color:#fff;height:60rem;width:100%;"></iframe>
 
 ----
 
@@ -49,10 +49,10 @@ FM-синтезатор (WIP)
 
 <small>https://github.com/krasnobaev/webasm-webgl-tutorial</small>
 
-* 8 простых примеров использования WebGL в JS, 5 уже готово
-* исходные примеры на JS https://mdn.github.io/webgl-examples/
-
 <iframe data-src="https://krasnobaev.github.io/webasm-webgl-tutorial/dist/#rust-5" style="background-color:#fff;height:30rem;width:100%;"></iframe>
+
+Note:
+  исходные примеры на JS https://mdn.github.io/webgl-examples/
 
 ----
 
