@@ -11,6 +11,12 @@
 reveal-md wasmjsbundlers.md -w --css style.css --template template.html
 ```
 
+## Build
+
+```bash
+reveal-md wasmjsbundlers.md -w --css style.css --template template.html --static dist
+```
+
 ## Print
 
 * open `localhost:1948/wasmjsbundlers.md?print-pdf` or press `e`-key
